@@ -1,4 +1,3 @@
-<!-- components/ui/TaskToggle.vue -->
 <template>
   <div class="relative inline-flex items-center cursor-pointer">
     <button 
