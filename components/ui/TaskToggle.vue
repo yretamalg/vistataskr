@@ -9,26 +9,8 @@
       }"
       @click="handleClick"
       ref="toggleButton"
+      :disabled="isLocked"
     >
-      <!-- Áreas clickeables invisibles -->
-      <div class="absolute inset-0 flex">
-        <!-- Área izquierda (completado) -->
-        <div 
-          class="w-1/3 h-full cursor-pointer" 
-          @click.stop="updateState('completed')"
-        ></div>
-        <!-- Área central (neutral) -->
-        <div 
-          class="w-1/3 h-full cursor-pointer" 
-          @click.stop="updateState('neutral')"
-        ></div>
-        <!-- Área derecha (fallido) -->
-        <div 
-          class="w-1/3 h-full cursor-pointer" 
-          @click.stop="updateState('failed')"
-        ></div>
-      </div>
-
       <!-- Indicador deslizante -->
       <div 
         class="absolute top-1 w-5 h-5 bg-white rounded-full transition-all duration-200 shadow-md"
@@ -43,37 +25,50 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
-type ToggleState = 'completed' | 'neutral' | 'failed';
+export type ToggleState = 'completed' | 'neutral' | 'failed';
 
 const props = defineProps<{
-  modelValue: ToggleState
+  modelValue: ToggleState;
+  isLocked?: boolean;
 }>();
 
-const emit = defineEmits<{
-  'update:modelValue': [ToggleState]
-}>();
+const emit = defineEmits(['update:modelValue']);
 
 const toggleButton = ref<HTMLElement | null>(null);
+const isLocked = ref(false);
 
-const updateState = (newState: ToggleState) => {
-  emit('update:modelValue', newState);
-};
+// Observar cambios en el estado
+watch(() => props.modelValue, (newValue) => {
+  // Bloquear solo si no es neutral
+  isLocked.value = newValue !== 'neutral';
+});
+
+// Observar cambios en el prop isLocked
+watch(() => props.isLocked, (newValue) => {
+  isLocked.value = !!newValue;
+});
 
 const handleClick = (event: MouseEvent) => {
-  if (!toggleButton.value) return;
+  if (!toggleButton.value || isLocked.value) return;
 
   const rect = toggleButton.value.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const width = rect.width;
   
-  if (x < width / 3) {
-    updateState('completed');
-  } else if (x < (width * 2) / 3) {
-    updateState('neutral');
+  if (x < width / 2) {
+    emit('update:modelValue', 'completed');
   } else {
-    updateState('failed');
+    emit('update:modelValue', 'failed');
   }
 };
+
+// Método para resetear el estado
+const reset = () => {
+  isLocked.value = false; // Desbloquear el toggle
+  emit('update:modelValue', 'neutral');
+};
+
+defineExpose({ reset });
 </script>

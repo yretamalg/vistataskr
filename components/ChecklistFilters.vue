@@ -7,53 +7,47 @@
           <button 
             v-for="(button, index) in navigationButtons" 
             :key="index"
-            class="px-6 py-3 bg-[#0096AF] text-white rounded-full hover:bg-[#008C9E] transition-colors flex items-center gap-2 text-sm"
+            class="px-6 py-2 bg-[#00A4B9] text-white rounded-full hover:bg-[#008C9E] transition-colors flex items-center gap-2 text-sm"
           >
+            <i v-if="button.icon" :class="button.icon" class="text-base"></i>
             {{ button.text }}
-            <i v-if="button.icon" :class="button.icon"></i>
           </button>
         </div>
 
+        <!-- Center - Reset Button -->
+        <button 
+          @click="$emit('reset')"
+          :disabled="!canReset"
+          class="px-6 py-2 rounded-full flex items-center gap-2 text-sm transition-colors"
+          :class="[
+            canReset 
+              ? 'bg-red-500 text-white hover:bg-red-600' 
+              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+          ]"
+        >
+          <i class="fas fa-undo text-base"></i>
+          Resetear estados
+        </button>
+
         <!-- Right side filters -->
         <div class="flex gap-4 items-center">
-          <select v-model="selectedBranch" class="border rounded-xl px-3 py-2 w-64">
+          <select v-model="selectedBranch" class="border rounded px-3 py-2 w-64 bg-white rounded-xl">
             <option value="">Sucursal</option>
             <option value="1">Sucursal 1</option>
             <option value="2">Sucursal 2</option>
+            <option value="3">Sucursal 3</option>
+            <option value="4">Sucursal 4</option>
+            <option value="5">Sucursal 5</option>
+            <option value="6">Sucursal 6</option>
           </select>
           <input 
             type="date" 
             v-model="selectedDate" 
-            class="border rounded-xl px-3 py-2 " 
+            class="border rounded-xl px-3 py-2 bg-white" 
           />
-          <div class="relative flex items-center">
-            <!-- Search Input con transición -->
-            <transition
-              enter-active-class="transition-all duration-300 ease-out"
-              enter-from-class="opacity-0 scale-95"
-              enter-to-class="opacity-100 scale-100"
-              leave-active-class="transition-all duration-200 ease-in"
-              leave-from-class="opacity-100 scale-100"
-              leave-to-class="opacity-0 scale-95"
-            >
-              <input
-                v-if="isSearchVisible"
-                v-model="searchQuery"
-                type="text"
-                placeholder="Buscar..."
-                class="border rounded-xl px-3 py-2 bg-white w-48 mr-2 transition-all duration-300"
-                @keyup.esc="isSearchVisible = false"
-                ref="searchInput"
-              />
-            </transition>
-            <!-- Botón de búsqueda -->
-            <button 
-              @click="toggleSearch"
-              class="text-[#00A4B9] px-2 hover:text-[#008C9E] transition-colors"
-            >
-              <i class="fas fa-search text-xl"></i>
-            </button>
-          </div>
+          <button class="text-[#00A4B9] px-2">
+            <i class="fas fa-search text-xl"></i>
+          </button>
         </div>
       </div>
     </div>
@@ -61,35 +55,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { ref } from 'vue'
+
+const props = defineProps<{
+  canReset: boolean
+}>()
 
 const selectedBranch = ref('')
 const selectedDate = ref('2024-10-07')
-const isSearchVisible = ref(false)
-const searchQuery = ref('')
-const searchInput = ref<HTMLInputElement | null>(null)
 
 const navigationButtons = [
   { text: 'Inicio', route: '/' },
   { text: 'Ir a Cumplimiento', route: '/cumplimiento' },
-  { text: 'Checklist', route: '/checklist', icon: 'fas fa-clipboard-list' }
+  { text: 'Atrás', route: '/checklist', icon: 'fas fa-arrow-left' }
 ]
 
-const toggleSearch = async () => {
-  isSearchVisible.value = !isSearchVisible.value
-  if (isSearchVisible.value) {
-    // Esperar a que el input sea montado y luego enfocarlo
-    await nextTick()
-    searchInput.value?.focus()
-  }
-}
-
-watch(searchQuery, (newValue) => {
-  // Emitir el valor de búsqueda para que el componente padre pueda manejarlo
-  emit('search', newValue)
-})
-
-const emit = defineEmits(['update:branch', 'update:date', 'search'])
+defineEmits(['update:branch', 'update:date', 'reset'])
 </script>
 
 <style scoped>

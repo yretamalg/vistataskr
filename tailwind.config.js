@@ -10,6 +10,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Roboto Condensed"', 'sans-serif'],
+      },
       colors: {
         teal: {
           100: '#E6FFFA',

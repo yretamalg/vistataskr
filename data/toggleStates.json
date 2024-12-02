@@ -1,0 +1,88 @@
+import { ref, computed } from 'vue'
+import type { TaskState } from '~/types/task'
+
+interface ToggleStateTask {
+  id: string
+  isLocked: number
+  currentState: TaskState
+}
+
+interface ToggleStates {
+  canReset: number
+  lastUpdate: string
+  tasks: ToggleStateTask[]
+}
+
+const initialToggleStates: ToggleStates = {
+  canReset: 1, // Cambiado a 1 para permitir el reset
+  lastUpdate: "2024-12-02T10:00:00",
+  tasks: [
+    {
+      id: "202410080000002e",
+      isLocked: 0,
+      currentState: "neutral"
+    },
+    {
+      id: "202410090000003e",
+      isLocked: 0,
+      currentState: "neutral"
+    },
+    {
+      id: "202410100000003e",
+      isLocked: 0,
+      currentState: "neutral"
+    },
+    {
+      id: "202410110000003e",
+      isLocked: 0,
+      currentState: "neutral"
+    },
+    {
+      id: "202410120000003e",
+      isLocked: 0,
+      currentState: "neutral"
+    }
+  ]
+}
+
+export function useToggleState() {
+  const toggleStates = ref<ToggleStates>(initialToggleStates)
+  
+  const canReset = computed(() => toggleStates.value.canReset === 1)
+  
+  function getTaskState(taskId: string) {
+    return toggleStates.value.tasks.find(t => t.id === taskId)
+  }
+  
+  function updateTaskState(taskId: string, newState: TaskState) {
+    const task = toggleStates.value.tasks.find(t => t.id === taskId)
+    if (task) {
+      task.currentState = newState
+      if (newState !== 'neutral') {
+        task.isLocked = 1
+      }
+      // Activar la capacidad de reset cuando al menos una tarea esté en estado no neutral
+      if (toggleStates.value.tasks.some(t => t.currentState !== 'neutral')) {
+        toggleStates.value.canReset = 1
+      }
+    }
+  }
+  
+  function resetAllTasks() {
+    if (canReset.value) {
+      toggleStates.value.tasks.forEach(task => {
+        task.isLocked = 0
+        task.currentState = 'neutral'
+      })
+      toggleStates.value.canReset = 0 // Desactivar el reset después de usarlo
+    }
+  }
+
+  return {
+    toggleStates,
+    canReset,
+    getTaskState,
+    updateTaskState,
+    resetAllTasks
+  }
+}

@@ -14,10 +14,6 @@ export default defineNuxtConfig({
         { 
           rel: 'stylesheet', 
           href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css'
-        },
-        {
-          rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap'
         }
       ]
     }
@@ -31,14 +27,16 @@ export default defineNuxtConfig({
         './plugins/**/*.{js,ts}',
         './nuxt.config.{js,ts}',
         './app.vue'
-      ],
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Roboto', 'sans-serif'],
-          },
-        },
-      }
+      ]
+    }
+  },
+  nitro: {
+    static: true
+  },
+  // Configuración para archivos JSON
+  vite: {
+    json: {
+      stringify: true
     }
   }
 })
