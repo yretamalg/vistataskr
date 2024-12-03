@@ -19,13 +19,13 @@ const initialToggleStates: ToggleStates = {
   tasks: [
     {
       id: "202410080000002e",
-      isLocked: 1,
-      currentState: "completed"
+      isLocked: 0,
+      currentState: "neutral"
     },
     {
       id: "202410090000003e",
-      isLocked: 1,
-      currentState: "failed"
+      isLocked: 0,
+      currentState: "neutral"
     },
     {
       id: "202410100000003e",
@@ -34,8 +34,8 @@ const initialToggleStates: ToggleStates = {
     },
     {
       id: "202410110000003e",
-      isLocked: 1,
-      currentState: "completed"
+      isLocked: 0,
+      currentState: "neutral"
     },
     {
       id: "202410120000003e",
